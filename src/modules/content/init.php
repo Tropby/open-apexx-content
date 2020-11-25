@@ -22,9 +22,9 @@ $module = array(1,950,
 'id' => 'content',
 'dependence' => array('comments','ratings'),
 'requirement' => array('main' => '1.2.0'),
-'version' => '1.1.2',
-'author' => 'Christian Scheb',
-'contact' => 'http://www.stylemotion.de',
+'version' => '1.2.2',
+'author' => 'Christian Scheb, Carsten Grings',
+'contact' => 'http://www.stylemotion.de, https://grings-software.de',
 'mediainput' => array(
 	1 =>	array(
 				'icon' => '<img src="design/mm/insert_text.gif" alt="{MM_INSERTCONTENT}" title="{MM_INSERTCONTENT}" style="vertical-align:middle;" />',

@@ -46,5 +46,8 @@ $lang['func_search'] = array (
 'SEARCH_CONTENT' => 'Inhalt'
 );
 
+$lang['func_sitemap'] = array (
+'SITEMAP_CONTENT' => 'Inhalt'
+);
 
 ?>

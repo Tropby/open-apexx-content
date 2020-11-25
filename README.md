@@ -1,6 +1,6 @@
 # Modul Inhalt (Content)
 
-Es handelt sich hierbei um ein Modul für das [open-apexx](open-apexx).
+Es handelt sich hierbei um ein Modul fÃ¼r das [open-apexx](https://github.com/Tropby/open-apexx).
 
 Dieses Modul kann Inhaltsseiten erstellen/bearbeiten/anzeigen.
 

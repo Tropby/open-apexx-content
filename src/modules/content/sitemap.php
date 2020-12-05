@@ -23,11 +23,12 @@ if ( !defined('APXRUN') ) die('You are not allowed to execute this file directly
 
 function sitemap_content()
 {
-	global $db;
+	global $db, $user;
 	
 	//Ergebnisse
-    $data=$db->fetch("SELECT id, title FROM ".PRE."_content WHERE ( active='1' ".section_filter().") ORDER BY title ASC");
+    $data=$db->fetch("SELECT a.id, a.title FROM ".PRE."_content AS a LEFT JOIN ".PRE."_content_rights AS d ON ( a.id = d.contentid ) WHERE ( active='1' AND searchable='1' AND ( d.usergroupid = ".(int)$user->info["groupid"]." OR d.usergroupid = -1 ) ".section_filter().") ORDER BY title ASC");
     $result = array();
+	
     if ( count($data) ) 
     {
 		foreach ( $data AS $res ) {

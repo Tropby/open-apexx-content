@@ -98,7 +98,7 @@ function show() {
 	
 	quicklink('content.add');
 	
-	$orderdef[0]='time';
+	$orderdef[0]='title';
 	$orderdef['title']=array('a.title','ASC','COL_TITLE');
 	$orderdef['user']=array('b.username','ASC','COL_USER');
 	$orderdef['time']=array('a.time','DESC','COL_ADDTIME');
@@ -107,8 +107,9 @@ function show() {
 	
 	$col[]=array('',1,'align="center"');
 	$col[]=array('COL_TITLE',50,'class="title"');
-	$col[]=array('COL_USER',20,'align="center"');
-	$col[]=array('COL_LASTCHANGE',20,'align="center"');
+	$col[]=array('COL_GROUPS',15,'align="center"');
+	$col[]=array('COL_USER',15,'align="center"');
+	$col[]=array('COL_LASTCHANGE',10,'align="center"');
 	$col[]=array('COL_HITS',10,'align="center"');
 	
 	
@@ -171,6 +172,17 @@ function show() {
 	$data=$db->fetch("SELECT a.id,a.secid,a.title,a.lastchange,a.allowcoms,a.allowrating,a.active,a.hits,b.userid,b.username FROM ".PRE."_content AS a LEFT JOIN ".PRE."_user AS b USING(userid) WHERE 1 ".$resultFilter.section_filter(true, 'a.secid')." ".getorder($orderdef).getlimit());
 	if ( count($data) ) {
 		foreach ( $data AS $res ) {
+			
+			$groups = $db->fetch("SELECT * FROM ".PRE."_content_rights AS a LEFT JOIN ".PRE."_user_groups AS b ON ( a.usergroupid = b.groupid ) WHERE a.contentid = ".$res["id"]);
+			$gr = array();
+			foreach( $groups as $g )
+			{
+				if( $g["usergroupid"] == -1 )
+					$gr[] = "Alle";
+				else
+					$gr[] = $g["name"];
+			}
+			
 			++$i;
 			
 			if ( $res['active'] ) $tabledata[$i]['COL1']='<img src="design/greendot.gif" alt="'.$apx->lang->get('CORE_ACTIVE').'" title="'.$apx->lang->get('CORE_ACTIVE').'" />';
@@ -192,9 +204,10 @@ function show() {
 			);
 			
 			$tabledata[$i]['COL2']='<a href="'.$link.'" target="_blank">'.$title.'</a>';
-			$tabledata[$i]['COL3']=replace($res['username']);
-			$tabledata[$i]['COL4']=mkdate($res['lastchange'],'<br />');
-			$tabledata[$i]['COL5']=$res['hits'];
+			$tabledata[$i]['COL3']=implode("<br />", $gr);
+			$tabledata[$i]['COL4']=replace($res['username']);
+			$tabledata[$i]['COL5']=mkdate($res['lastchange'],'<br />');
+			$tabledata[$i]['COL6']=$res['hits'];
 			
 			//Optionen
 			if ( $apx->user->has_right('content.edit') && ( $res['userid']==$apx->user->info['userid'] || $apx->user->has_spright('content.edit') ) ) $tabledata[$i]['OPTIONS'].=optionHTML('edit.gif', 'content.edit', 'id='.$res['id'], $apx->lang->get('CORE_EDIT'));
@@ -252,6 +265,13 @@ function add() {
 			
 			$db->dinsert(PRE.'_content','secid,catid,title,text,meta_description,userid,time,lastchange,lastchange_userid,searchable,allowcoms,allowrating,active');
 			$nid=$db->insert_id();
+			
+			$db->query("DELETE FROM ".PRE."_content_rights WHERE contentid = ".$_REQUEST["id"]);
+			foreach( $_POST['usergroups'] as $gid )
+			{
+				$db->query("INSERT INTO ".PRE."_content_rights (contentid, usergroupid) VALUES ('".$_REQUEST["id"]."', '".$gid."') ");
+			}
+			
 			logit('CONTENT_ADD','ID #'.$nid);
 			
 			//Inlinescreens
@@ -309,6 +329,14 @@ function edit() {
 			}
 			
 			$db->dupdate(PRE.'_content','secid,catid,title,text,meta_description,lastchange,lastchange_userid,allowcoms,searchable,allowrating'.$addfields,"WHERE ( id='".$_REQUEST['id']."' ".iif(!$apx->user->has_spright('content.edit')," AND userid='".$apx->user->info['userid']."'")." ) LIMIT 1");
+			
+			$db->query("DELETE FROM ".PRE."_content_rights WHERE contentid = ".$_REQUEST["id"]);
+			
+			foreach( $_POST['usergroups'] as $gid )
+			{
+				$db->query("INSERT INTO ".PRE."_content_rights (contentid, usergroupid) VALUES ('".$_REQUEST["id"]."', '".$gid."') ");
+			}
+			
 			logit('CONTENT_EDIT','ID #'.$_REQUEST['id']);
 			printJSRedirect(get_index('content.show'));
 		}
@@ -319,6 +347,18 @@ function edit() {
 		$_POST['secid']=unserialize_section($_POST['secid']);
 		
 		mediamanager('content');
+		
+		$data = $db->fetch("SELECT * FROM ".PRE."_content_rights WHERE contentid = ".$_REQUEST["id"]);
+		$selected = [];
+		$selected_all = 0;
+		foreach($data as $r)
+		{
+			$selected[] = $r["usergroupid"];
+			if( $r["usergroupid"] == -1 )
+				$selected_all = 1;
+		}
+		$apx->tmpl->assign('SELECTED_GROUPS',$selected);		
+		$apx->tmpl->assign('SELECTED_ALL',$selected_all);				
 		
 		$apx->tmpl->assign('CATLIST',$this->get_catlist($_POST['catid']));
 		$apx->tmpl->assign('SECID',$_POST['secid']);
@@ -349,6 +389,7 @@ function del() {
 		if ( !checkToken() )  printInvalidToken();
 		else {
 			$db->query("DELETE FROM ".PRE."_content WHERE ( id='".$_REQUEST['id']."' ".iif(!$apx->user->has_spright('content.del')," AND userid='".$apx->user->info['userid']."'")." ) LIMIT 1");
+			$db->query("DELETE FROM ".PRE."_content_rights WHERE contentid = ".$_REQUEST["id"]);
 			
 			//Kommentare + Bewertungen löschen
 			if ( $db->affected_rows() ) {

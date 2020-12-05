@@ -35,7 +35,7 @@ function search_content($items,$conn) {
 	$searchstring=implode($conn,$search);
 	
 	//Ergebnisse
-	$data=$db->fetch("SELECT id,title FROM ".PRE."_content WHERE ( searchable='1' AND active='1' ".section_filter()." AND ( ".$searchstring." ) ) ORDER BY title ASC");
+	$data=$db->fetch("SELECT a.id,title FROM ".PRE."_content AS a LEFT JOIN ".PRE."_content_rights AS d ON ( a.id = d.contentid ) WHERE ( searchable='1' AND active='1' ".section_filter()." AND ( d.usergroupid = ".$user->info["groupid"]." OR  d.usergroupid = -1 ) AND ( ".$searchstring." ) ) ORDER BY title ASC");
 	if ( count($data) ) {
 		foreach ( $data AS $res ) {
 			++$i;

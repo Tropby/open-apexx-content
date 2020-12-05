@@ -121,6 +121,24 @@ elseif ( SETUPMODE=='update' ) {
 			$queries=split_sql($mysql);
 			foreach ( $queries AS $query ) $db->query($query);
 		
+		case 112: //zu 2.0.0
+		
+			$mysql="
+			CREATE TABLE `apx_content_rights` (
+				`id` int(11) unsigned NOT NULL auto_increment,
+				`contentid` int(11) NOT NULL,
+				`usergroupid` int(11) NOT NULL,
+				PRIMARY KEY  (`id`)
+			) ENGINE=MyISAM;			
+			";
+			$queries=split_sql($mysql);
+			foreach ( $queries AS $query ) $db->query($query);
+			
+			$data = $db->fetch("SELECT id FROM `apx_content`");
+			foreach( $data as $d )
+			{
+				$db->query("INSERT INTO `apx_content_rights` (contentid, usergroupid) VALUES (".$d["id"].", -1)");
+			}				
 		
 	}
 }

@@ -18,7 +18,6 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 define('APXRUN',true);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,7 +60,8 @@ $_REQUEST['id']=(int)$_REQUEST['id'];
 	
 	//Kommentare zeigen
 	elseif ( $apx->is_module('comments') && $_REQUEST['id'] && $_REQUEST['comments'] ) {
-		$res=$db->first("SELECT title FROM ".PRE."_content AS a WHERE ( id='".$_REQUEST['id']."' AND active='1' ".section_filter()." ) LIMIT 1");
+		$res=$db->first("SELECT title FROM ".PRE."_content AS a LEFT JOIN
+				".PRE."_content_rights AS d ON a.id = d.contentid WHERE ( id='".$_REQUEST['id']."' AND active='1' AND ( d.usergroupid = ".$user->info["groupid"]." OR d.usergroupid = -1 ) ".section_filter()." ) LIMIT 1");
 		
 		//Titel
 		$tt=explode('->',$res['title']);
@@ -80,23 +80,62 @@ $_REQUEST['id']=(int)$_REQUEST['id'];
 	
 	
 	//Content aus der Datenbank
-	elseif ( $_REQUEST['id'] ) {
+	elseif ( $_REQUEST['id'] )
+	{
+		
 		$apx->lang->drop('content');
 		
 		//Klicks+1
 		$db->query("UPDATE ".PRE."_content SET hits=hits+1 WHERE id='".$_REQUEST['id']."' LIMIT 1");
 		
-		$res=$db->first("SELECT a.*,b.username,b.email,b.pub_hidemail,c.username AS lc_username,c.email AS lc_email,c.pub_hidemail AS lc_pub_hidemail FROM ".PRE."_content AS a LEFT JOIN ".PRE."_user AS b USING(userid) LEFT JOIN ".PRE."_user AS c ON a.lastchange_userid=c.userid WHERE ( a.id='".$_REQUEST['id']."' ".iif(!$user->is_team_member()," AND a.active='1' ".section_filter()." ")." ) LIMIT 1");
+		$res=$db->first("
+			SELECT 
+				a.*,
+				b.username,
+				b.email,
+				b.pub_hidemail,
+				c.username AS lc_username,
+				c.email AS lc_email,
+				c.pub_hidemail AS lc_pub_hidemail 
+				
+			FROM 
+				".PRE."_content AS a 
+				
+			LEFT JOIN
+				".PRE."_content_rights AS d ON a.id = d.contentid
+			LEFT JOIN 
+				".PRE."_user AS b USING(userid) 
+			LEFT JOIN 
+				".PRE."_user AS c ON a.lastchange_userid=c.userid 
+				
+			WHERE 
+				( 
+					a.id='".$_REQUEST['id']."' 
+					".iif(
+						!$user->is_team_member(),
+						" AND a.active='1' ".section_filter()." "						
+					)." ".
+					" AND ( d.usergroupid = ".$user->info["groupid"]." OR d.usergroupid = -1 )
+				)
+				
+			LIMIT 1");
 		if ( !$res['id'] ) filenotfound();
 		
 		//Titel
 		$headline = array();
 		$tt=explode('->',$res['title']);
 		$number=count($tt);
-		foreach ( $tt AS $one ) {
+		foreach ( $tt AS $one ) 
+		{
 			++$hi;
-			if ( $number==$hi ) headline(trim($one),str_replace('&','&amp;',$_SERVER['REQUEST_URI']));
-			else headline(trim($one));
+			if ( $number==$hi ) 
+				headline(trim($one),str_replace('&','&amp;',$_SERVER['REQUEST_URI']));
+			else 
+			{		
+				$linkData = $db->first("SELECT * FROM ".PRE."_content WHERE title LIKE '".trim($one)."' LIMIT 1" );
+				headline(trim($one), "/content,".$linkData["id"].",".$one.".html");				
+			}
+			
 			$last=$one;
 			$headline[] = array(
 				'TEXT' => trim($one)

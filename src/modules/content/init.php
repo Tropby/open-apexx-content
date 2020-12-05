@@ -26,10 +26,10 @@ if ( !defined('APXRUN') ) die('You are not allowed to execute this file directly
 $module = array(1,950,
 'id' => 'content',
 'dependence' => array('comments','ratings'),
-'requirement' => array('main' => '1.2.0'),
-'version' => '1.2.2',
+'requirement' => array('main' => '1.3.0', 'user' => '1.2.4'),
+'version' => '2.0.0',
 'author' => 'Christian Scheb, Carsten Grings',
-'contact' => 'http://www.stylemotion.de, https://grings-software.de',
+'contact' => 'http://www.stylemotion.de',
 'mediainput' => array(
 	1 =>	array(
 				'icon' => '<img src="design/mm/insert_text.gif" alt="{MM_INSERTCONTENT}" title="{MM_INSERTCONTENT}" style="vertical-align:middle;" />',
@@ -62,6 +62,7 @@ R = Rechte für Alle
 //$func['']=array('',true);
 $func['CONTENT_STATS']=array('content_stats',true);
 $func['CONTENT_SHOW'] =array('content_show',true);
+$func['CONTENT_PARSE'] =array('content_parse',true);
 
 /*
 F = Funktions-Name

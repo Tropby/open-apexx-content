@@ -90,6 +90,7 @@ $lang['config'] = array (
 $lang['actions']['show'] = array (
 'COL_TITLE' => 'Titel',
 'COL_USER' => 'Autor',
+'COL_GROUPS' => 'Benutzergruppen',
 'COL_ADDTIME' => 'Erstellungsdatum',
 'COL_LASTCHANGE' => 'Letzte Änderung',
 'COL_HITS' => 'Klicks',
@@ -123,7 +124,9 @@ $lang['actions']['add'] = $lang['actions']['edit'] = array (
 'PUBNOW' => 'Sofort veröffentlichen',
 'SEARCHABLE' => 'In die Suche einbeziehen',
 'SUBMIT_ADD' => 'Seite erstellen',
-'SUBMIT_EDIT' => 'Aktualisieren'
+'SUBMIT_EDIT' => 'Aktualisieren',
+'USERGROUP' => 'Benutzergruppen',
+'ALL_USERGROUPS' => 'Alle'
 );
 
 //DEL

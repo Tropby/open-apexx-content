@@ -21,6 +21,12 @@
 </tr>
 {/if}
 <tr>
+	<td>{LANG[USERGROUP]}:</td>
+	<td><select name="usergroups[]" multiple="multiple"><option value="-1" style="font-weight:bold;" {if SELECTED_ALL}selected='selected'{/if}>{LANG[ALL_USERGROUPS]}</option>{USERGROUPS(SELECTED_GROUPS)}</select><br />
+	Mit STRG + Klick mehrere auswählen.
+	</td>
+</tr>
+<tr>
 <td>{LANG[CATEGORY]}:</td>
 <td><select name="catid">{CATLIST}</select></td>
 </tr>

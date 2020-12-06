@@ -60,6 +60,7 @@ if ( SETUPMODE=='install' ) {
 elseif ( SETUPMODE=='uninstall' ) {
 	$mysql="
 		DROP TABLE `apx_content`;
+		DROP TABLE `apx_content_rights`;
 	";
 	$queries=split_sql($mysql);
 	foreach ( $queries AS $query ) $db->query($query);

@@ -66,12 +66,52 @@ function content_show($id='0', $template='inline')
 	else
 	{		
 		$tmpl->assign('ID', $id);
-		$tmpl->assign('PAGE', "Dieser Teil der Webseite (".$data["title"].") wird zurzeit Ã¼berarbeitet! Bitte haben Sie etwas Geduld. Danke!");
+		$tmpl->assign('PAGE', "Dieser Teil der Webseite (".$data["title"].") wird zurzeit überarbeitet! Bitte haben Sie etwas Geduld. Danke!");
 		$tmpl->assign('TITLE', "Wartungsarbeiten" );
 		$tmpl->assign('ANKER', "CONTENT_".$id);
 	}
 	
 	$tmpl->parse('functions/'.$template,'content');
+}
+
+function content_parse($id)
+{
+	global $set, $db, $apx, $user;
+	
+	$tmpl=new tengine;
+	
+	$data = $db->first("SELECT * FROM ".PRE."_content AS a LEFT JOIN ".PRE."_content_rights AS d ON a.id = d.contentid WHERE a.id=".$id." AND ( d.usergroupid = ".$user->info["groupid"]." OR d.usergroupid = -1 );");
+
+	if( !is_dir($tmpl->get_templatepath($override_module)."content") )
+	{
+		mkdir( $tmpl->get_templatepath($override_module)."content" );
+	}
+
+	if( $data["active"] )
+	{
+		$lastChanged = $data["lastchange"];
+
+		$path = $tmpl->get_templatepath($override_module)."content/content_".$id.'.html';
+		$filetime = 0;
+		if( is_file($path) )
+			$filetime = filemtime($path);
+
+		if( $lastChanged > $filetime )
+		{
+			//Content
+			$content = mediamanager_inline($data['text']);
+			if ( $apx->is_module('glossar') ) $content = glossar_highlight($content);
+
+			$fp = fopen( $path, "w+" );
+			fwrite( $fp, $content );
+			fclose($fp);	
+		}
+		$tmpl->parse("content/content_".$id, 'content');
+	}
+	else
+	{
+		echo "Content not found!";
+	}	
 }
 
 ?>

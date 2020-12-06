@@ -27,7 +27,7 @@ $module = array(1,950,
 'id' => 'content',
 'dependence' => array('comments','ratings'),
 'requirement' => array('main' => '1.3.0', 'user' => '1.2.4'),
-'version' => '2.0.0',
+'version' => '2.1.0',
 'author' => 'Christian Scheb, Carsten Grings',
 'contact' => 'http://www.stylemotion.de',
 'mediainput' => array(
@@ -58,15 +58,17 @@ R = Rechte für Alle
 */
 
 
-//Template-Funktionen     F           V
+//Template-Funktionen     F           V			D			P
 //$func['']=array('',true);
-$func['CONTENT_STATS']=array('content_stats',true);
-$func['CONTENT_SHOW'] =array('content_show',true);
-$func['CONTENT_PARSE'] =array('content_parse',true);
+$func['CONTENT_STATS']=array('content_stats',true, "Shows the content stats.");
+$func['CONTENT_SHOW'] =array('content_show',true, 'Shows a content text in an other template.', array("ID" => "content id"));
+$func['CONTENT_PARSE'] =array('content_parse',true,'Pasing a content text as template.', array("ID" => "content id to parse"));
 
 /*
 F = Funktions-Name
 V = Variablen akzeptieren
+D = Beschreibung der Template-Funktion
+P = Array: Parameter der Template-Funktion
 */
 
 

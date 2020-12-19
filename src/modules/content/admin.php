@@ -266,10 +266,9 @@ function add() {
 			$db->dinsert(PRE.'_content','secid,catid,title,text,meta_description,userid,time,lastchange,lastchange_userid,searchable,allowcoms,allowrating,active');
 			$nid=$db->insert_id();
 			
-			$db->query("DELETE FROM ".PRE."_content_rights WHERE contentid = ".$_REQUEST["id"]);
 			foreach( $_POST['usergroups'] as $gid )
 			{
-				$db->query("INSERT INTO ".PRE."_content_rights (contentid, usergroupid) VALUES ('".$_REQUEST["id"]."', '".$gid."') ");
+				$db->query("INSERT INTO ".PRE."_content_rights (contentid, usergroupid) VALUES ('".$nid."', '".$gid."') ");
 			}
 			
 			logit('CONTENT_ADD','ID #'.$nid);

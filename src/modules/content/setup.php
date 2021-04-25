@@ -24,7 +24,7 @@ if ( !defined('APXRUN') ) die('You are not allowed to execute this file directly
 
 //Installieren
 if ( SETUPMODE=='install' ) {
-	$mysql="
+	$mysql= "
 		CREATE TABLE `apx_content` (
 		  `id` int(11) unsigned NOT NULL auto_increment,
 		  `secid` tinytext NOT NULL,
@@ -44,7 +44,14 @@ if ( SETUPMODE=='install' ) {
 		  PRIMARY KEY  (`id`),
 		  KEY `active` (`active`)
 		) ENGINE=MyISAM ;
-		
+
+		CREATE TABLE `apx_content_rights` (
+			`id` int(11) unsigned NOT NULL auto_increment,
+			`contentid` int(11) NOT NULL,
+			`usergroupid` int(11) NOT NULL,
+			PRIMARY KEY  (`id`)
+		) ENGINE=MyISAM;			
+
 		INSERT INTO `apx_config` (`module`, `varname`, `type`, `addnl`, `value`, `tab`, `lastchange`, `ord`) VALUES
 		('content', 'searchable', 'switch', '', '1', '', 0, 1000),
 		('content', 'coms', 'switch', '', '1', '', 0, 2000),
